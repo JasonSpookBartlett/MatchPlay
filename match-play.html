@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Match Play</title>
 <meta name="application-name" content="Match Play">
 <meta name="description" content="Match Play - billiards match scorer">
@@ -33,16 +33,22 @@
 
   html, body {
     width: 100%; height: 100%;
-    height: 100dvh;
     background: var(--bg);
     font-family: 'Inter', sans-serif;
     color: var(--ivory);
     overflow: hidden;
     touch-action: manipulation;
+    -webkit-text-size-adjust: 100%;
   }
 
   /* ─── SCREENS ─── */
-  .screen { display: none; width: 100vw; height: 100vh; height: 100dvh; }
+  .screen {
+    display: none;
+    width: 100vw;
+    width: 100dvw;
+    height: 100vh;
+    height: 100dvh;
+  }
   .screen.active { display: flex; }
 
   /* ─── SETUP SCREEN ─── */
@@ -53,6 +59,7 @@
     background: radial-gradient(ellipse at center, #1a2a1a 0%, #0d0d0d 70%);
     gap: 20px;
     padding: 20px;
+    position: relative;
   }
 
   .setup-title {
@@ -267,6 +274,26 @@
     box-shadow: 0 0 30px rgba(57,255,133,0.35);
   }
 
+  .setup-exit-btn {
+    background: none;
+    border: 1.5px solid #3a1a1a;
+    border-radius: 8px;
+    color: #664444;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 7px 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+    -webkit-tap-highlight-color: transparent;
+    position: absolute;
+    bottom: 16px;
+    right: 16px;
+  }
+  .setup-exit-btn:active { border-color: #e05555; color: #e05555; }
+
   /* ─── GAME SCREEN ─── */
   #game {
     flex-direction: column;
@@ -366,6 +393,21 @@
     box-shadow: 0 0 8px rgba(57,255,133,0.5);
   }
 
+  /* Active player highlighting */
+  .player-panel.active-player .player-name {
+    color: var(--neon-green);
+    text-shadow: 0 0 18px rgba(57,255,133,0.5);
+  }
+
+  .player-panel.active-player .score-display {
+    color: #ffffff;
+    text-shadow: 0 0 30px rgba(57,255,133,0.2);
+  }
+
+  .player-panel.active-player {
+    background: rgba(57,255,133,0.04);
+  }
+
   /* Centre column */
   .centre-col {
     display: flex;
@@ -377,6 +419,30 @@
     width: 90px;
     border-left: 1px solid #1e1e1e;
     border-right: 1px solid #1e1e1e;
+    position: relative;
+  }
+
+  /* Turn arrow */
+  .turn-arrow {
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+    transition: all 0.3s cubic-bezier(0.22,1,0.36,1);
+    filter: drop-shadow(0 0 4px rgba(57,255,133,0.6));
+  }
+
+  .turn-arrow.left {
+    border-right: 14px solid var(--neon-green);
+    border-left: none;
+    left: -18px;
+  }
+
+  .turn-arrow.right {
+    border-left: 14px solid var(--neon-green);
+    border-right: none;
+    right: -18px;
   }
 
   .vs-text {
@@ -429,7 +495,7 @@
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    padding: 0 20px;
+    padding: 0 60px;
     gap: 16px;
     z-index: 50;
   }
@@ -603,7 +669,6 @@
     100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
   }
 
-  /* Race-to edit popup */
 
   #raceto-modal {
     display: none;
@@ -767,6 +832,7 @@
   </div>
 
   <button class="begin-btn" id="beginBtn">BEGIN MATCH</button>
+  <button class="setup-exit-btn" onclick="exitApp()">EXIT APP</button>
 </div>
 
 <!-- GAME SCREEN -->
@@ -780,6 +846,7 @@
 
     <!-- Centre column -->
     <div class="centre-col">
+      <div class="turn-arrow" id="turnArrow"></div>
       <div class="vs-text">vs.</div>
       <div class="race-to" onclick="openRaceToModal()">
         <span class="race-to-label">Race to </span><span id="raceDisplay">7</span>
@@ -871,6 +938,18 @@
   });
 
 
+  // ── Active player system ──
+  let activePlayer = 0; // set when match starts
+
+  function setActivePlayer(p) {
+    activePlayer = p;
+    document.getElementById('p1panel').classList.toggle('active-player', p === 0);
+    document.getElementById('p2panel').classList.toggle('active-player', p === 1);
+    const arrow = document.getElementById('turnArrow');
+    arrow.className = 'turn-arrow ' + (p === 0 ? 'left' : 'right');
+  }
+
+  // Touch handlers for each panel
   [['p1panel', 0], ['p2panel', 1]].forEach(([id, player]) => {
     const el = document.getElementById(id);
     let touchStartY = null;
@@ -898,20 +977,34 @@
       const isSwipeUp   = dy < -40 && Math.abs(dy) > Math.abs(dx) * 1.2;
 
       if (isSwipeDown) {
-        removePoint(player);
+        // Swipe down always adjusts active player's score down
+        removePoint(activePlayer);
       } else if (isSwipeUp) {
-        addPoint(player);
+        // Swipe up always adds to active player's score
+        addPoint(activePlayer);
       } else if (!moved) {
-        addPoint(player);
+        // Tap: if tapping the inactive player's side, switch active player
+        // If tapping the active player's side, add a point
+        if (player !== activePlayer) {
+          setActivePlayer(player);
+        } else {
+          addPoint(activePlayer);
+        }
       }
       touchStartY = null;
       touchStartX = null;
       moved = false;
     }, { passive: true });
 
-    // Mouse fallback for desktop testing
+    // Mouse fallback for desktop
     el.addEventListener('click', () => {
-      if (!('ontouchstart' in window)) addPoint(player);
+      if (!('ontouchstart' in window)) {
+        if (player !== activePlayer) {
+          setActivePlayer(player);
+        } else {
+          addPoint(activePlayer);
+        }
+      }
     });
   });
 
@@ -1060,6 +1153,7 @@
     document.getElementById('raceDisplay').textContent = raceTo;
 
     buildTracks();
+    setActivePlayer(breakPlayer !== null ? breakPlayer : 0);
     showScreen('game');
   }
 
@@ -1146,9 +1240,9 @@
     scores = [0, 0];
     history = [];
     matchOver = false;
-
     document.getElementById('p1score').textContent = '0';
     document.getElementById('p2score').textContent = '0';
+    setActivePlayer(breakPlayer !== null ? breakPlayer : 0);
   }
 
   function goToSetup() {
@@ -1174,5 +1268,6 @@
     });
   }
 </script>
+
 </body>
 </html>
