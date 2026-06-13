@@ -305,10 +305,30 @@
     letter-spacing: 0.08em;
     text-align: center;
     line-height: 1;
+    color: #ffffff;
+    -webkit-text-stroke: 0px;
   }
 
-  #p1panel .player-name { color: #cc2222; }
-  #p2panel .player-name { color: #2255cc; }
+  /* White text with coloured shadow/outline for each player */
+  #p1panel .player-name {
+    color: #ffffff;
+    text-shadow:
+      -1px -1px 0 #990000,
+       1px -1px 0 #990000,
+      -1px  1px 0 #990000,
+       1px  1px 0 #990000,
+       0    0   8px rgba(180, 0, 0, 0.6);
+  }
+
+  #p2panel .player-name {
+    color: #ffffff;
+    text-shadow:
+      -1px -1px 0 #003399,
+       1px -1px 0 #003399,
+      -1px  1px 0 #003399,
+       1px  1px 0 #003399,
+       0    0   8px rgba(0, 40, 180, 0.6);
+  }
 
   .score-display {
     font-family: 'Bebas Neue', sans-serif;
@@ -378,13 +398,25 @@
   }
 
   #p1panel.active-player .player-name {
-    color: #ff3333;
-    text-shadow: 0 0 20px rgba(255, 30, 30, 0.7);
+    color: #ffffff;
+    text-shadow:
+      -1px -1px 0 #cc0000,
+       1px -1px 0 #cc0000,
+      -1px  1px 0 #cc0000,
+       1px  1px 0 #cc0000,
+       0    0   16px rgba(255, 20, 20, 0.8),
+       0    0   30px rgba(255, 20, 20, 0.4);
   }
 
   #p2panel.active-player .player-name {
-    color: #3377ff;
-    text-shadow: 0 0 20px rgba(30, 80, 255, 0.7);
+    color: #ffffff;
+    text-shadow:
+      -1px -1px 0 #0044cc,
+       1px -1px 0 #0044cc,
+      -1px  1px 0 #0044cc,
+       1px  1px 0 #0044cc,
+       0    0   16px rgba(20, 80, 255, 0.8),
+       0    0   30px rgba(20, 80, 255, 0.4);
   }
 
   .player-panel.active-player .score-display {
@@ -864,8 +896,8 @@
   <div class="game-main">
     <!-- Player 1 -->
     <div class="player-panel" id="p1panel">
-      <div class="player-name" id="p1display">PLAYER 1</div>
       <div class="score-display" id="p1score">0</div>
+      <div class="player-name" id="p1display">PLAYER 1</div>
     </div>
 
     <!-- Centre column -->
@@ -879,8 +911,8 @@
 
     <!-- Player 2 -->
     <div class="player-panel" id="p2panel">
-      <div class="player-name" id="p2display">PLAYER 2</div>
       <div class="score-display" id="p2score">0</div>
+      <div class="player-name" id="p2display">PLAYER 2</div>
     </div>
   </div>
 
