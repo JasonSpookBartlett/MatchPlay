@@ -1464,6 +1464,8 @@
     buildTracks();
     setActivePlayer(breakPlayer !== null ? breakPlayer : 0);
     showScreen('game');
+    // Play break sound as match begins
+    setTimeout(() => playBreakSound(), 300);
   }
 
   function buildTracks() { /* dots removed */ }
@@ -1574,8 +1576,7 @@
     void scoreEl.offsetWidth;
     scoreEl.classList.add('bump');
 
-    // Fire ball zoom + sound
-    playBreakSound();
+    // Fire ball zoom animation
     fireBallZoom(player);
 
     updateTracks();
@@ -1634,6 +1635,7 @@
     document.getElementById('p2score').textContent = '0';
     setActivePlayer(lastWinner !== null ? lastWinner : 0);
     showScreen('game');
+    setTimeout(() => playBreakSound(), 300);
   }
 
   function returnToSetup() {
