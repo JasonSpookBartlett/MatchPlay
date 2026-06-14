@@ -478,12 +478,25 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 10px;
+    gap: 4px;
     flex-shrink: 0;
-    width: 90px;
-    border-left: 1px solid #1e1e1e;
-    border-right: 1px solid #1e1e1e;
+    width: 130px;
     position: relative;
+    background: rgba(0,0,0,0.35);
+    border-left: 1px solid #2a2a2a;
+    border-right: 1px solid #2a2a2a;
+    border-radius: 0;
+    padding: 10px 6px;
+  }
+
+  /* Glowing box outline */
+  .centre-col::before {
+    content: '';
+    position: absolute;
+    inset: 12px -1px;
+    border: 1px solid rgba(212,168,67,0.25);
+    border-radius: 8px;
+    pointer-events: none;
   }
 
   /* Turn arrow */
@@ -491,31 +504,22 @@
     position: absolute;
     width: 0;
     height: 0;
-    border-top: 10px solid transparent;
-    border-bottom: 10px solid transparent;
+    border-top: 11px solid transparent;
+    border-bottom: 11px solid transparent;
     transition: all 0.3s cubic-bezier(0.22,1,0.36,1);
-    filter: drop-shadow(0 0 4px rgba(57,255,133,0.6));
+    filter: drop-shadow(0 0 5px rgba(57,255,133,0.7));
   }
 
   .turn-arrow.left {
-    border-right: 14px solid var(--neon-green);
+    border-right: 15px solid var(--neon-green);
     border-left: none;
-    left: -18px;
+    left: -20px;
   }
 
   .turn-arrow.right {
-    border-left: 14px solid var(--neon-green);
+    border-left: 15px solid var(--neon-green);
     border-right: none;
-    right: -18px;
-  }
-
-  .vs-text {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 2rem;
-    color: var(--gold);
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    text-shadow: 0 0 16px rgba(212,168,67,0.4);
+    right: -20px;
   }
 
   .race-to {
@@ -526,23 +530,55 @@
     -webkit-tap-highlight-color: transparent;
     transition: opacity 0.15s;
     text-align: center;
-    line-height: 1.2;
+    line-height: 1.1;
   }
 
   .race-to:active { opacity: 0.7; }
 
   .race-to-label {
     font-family: 'Inter', sans-serif;
-    font-size: 0.55rem;
-    letter-spacing: 0.14em;
+    font-size: 0.5rem;
+    letter-spacing: 0.16em;
     text-transform: uppercase;
-    color: #666;
+    color: #888;
   }
 
   .race-to span:last-child {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: 1.8rem;
+    font-size: 1.4rem;
     color: var(--gold);
+    line-height: 1;
+  }
+
+  .vs-text {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 3rem;
+    color: var(--gold);
+    letter-spacing: 0.04em;
+    text-shadow: 0 0 24px rgba(212,168,67,0.5), 0 0 50px rgba(212,168,67,0.2);
+    line-height: 1;
+  }
+
+  .racks-played {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1.1;
+    margin-top: 2px;
+  }
+
+  .racks-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.45rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #666;
+  }
+
+  .racks-value {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.4rem;
+    color: #ffffff;
     line-height: 1;
   }
 
@@ -1068,9 +1104,14 @@
     <!-- Centre column -->
     <div class="centre-col">
       <div class="turn-arrow" id="turnArrow"></div>
-      <div class="vs-text">vs.</div>
       <div class="race-to" onclick="openRaceToModal()">
-        <span class="race-to-label">Race to </span><span id="raceDisplay">7</span>
+        <span class="race-to-label">Race to</span>
+        <span id="raceDisplay">7</span>
+      </div>
+      <div class="vs-text">vs.</div>
+      <div class="racks-played">
+        <span class="racks-label">Frames Played</span>
+        <span class="racks-value" id="racksDisplay">0</span>
       </div>
     </div>
 
@@ -1205,7 +1246,13 @@
   let history = []; // [{player: 0|1}]
   let matchOver = false;
   let lastWinner = null;
-  let gameType = '8ball'; // '8ball', '9ball', '10ball'
+  let gameType = '8ball';
+  let racksPlayed = 0;
+
+  function updateRacksDisplay() {
+    const el = document.getElementById('racksDisplay');
+    if (el) el.textContent = racksPlayed;
+  } // '8ball', '9ball', '10ball'
 
   function selectGame(type) {
     gameType = type;
@@ -1454,6 +1501,7 @@
     scores = [0, 0];
     history = [];
     matchOver = false;
+    racksPlayed = 0;
 
     document.getElementById('p1display').textContent = p1;
     document.getElementById('p2display').textContent = p2;
@@ -1569,6 +1617,8 @@
     if (matchOver) return;
     scores[player]++;
     history.push({ player });
+    racksPlayed++;
+    updateRacksDisplay();
 
     const scoreEl = document.getElementById(player === 0 ? 'p1score' : 'p2score');
     scoreEl.textContent = scores[player];
@@ -1600,6 +1650,8 @@
   function removePoint(player) {
     if (matchOver || scores[player] === 0) return;
     scores[player]--;
+    racksPlayed = Math.max(0, racksPlayed - 1);
+    updateRacksDisplay();
     // Also trim history if last entry was this player
     for (let i = history.length - 1; i >= 0; i--) {
       if (history[i].player === player) { history.splice(i, 1); break; }
@@ -1629,6 +1681,7 @@
     scores = [0, 0];
     history = [];
     matchOver = false;
+    racksPlayed = 0;
     raceTo = 7;
     document.getElementById('raceDisplay').textContent = raceTo;
     document.getElementById('p1score').textContent = '0';
