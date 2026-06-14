@@ -113,20 +113,70 @@
   .setup-field input:focus { border-color: var(--neon-green); }
   .setup-field input::placeholder { color: #444; font-weight: 400; }
 
-  .race-row {
+  /* Game options row - game type + race to side by side */
+  .game-options-row {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    gap: 24px;
+    width: 100%;
+    max-width: 600px;
+    justify-content: center;
+  }
+
+  .game-type-col {
     display: flex;
     flex-direction: column;
     gap: 6px;
-    align-items: center;
+    align-items: flex-start;
   }
 
-  .race-row label {
+  .options-label {
     font-size: 0.65rem;
     letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--chalk);
     opacity: 0.7;
   }
+
+  .ball-selector {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .ball-pick {
+    background: none;
+    border: 2px solid transparent;
+    border-radius: 50%;
+    padding: 3px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.55;
+    filter: brightness(0.8);
+  }
+
+  .ball-pick.selected {
+    border-color: var(--neon-green);
+    box-shadow: 0 0 10px rgba(57,255,133,0.5), 0 0 20px rgba(57,255,133,0.2);
+    opacity: 1;
+    filter: brightness(1.1);
+  }
+
+  .ball-pick:active { transform: scale(0.92); }
+
+  .race-row {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-items: flex-start;
+  }
+
+  .race-row label { display: none; } /* label now uses .options-label */
 
   /* +/- stepper */
   .stepper {
@@ -807,14 +857,103 @@
     </div>
   </div>
 
-  <div class="race-row">
-    <label>Race to (frames)</label>
-    <div class="stepper">
-      <button class="stepper-btn" id="stepDown">−</button>
-      <div class="stepper-divider"></div>
-      <input class="stepper-value" type="number" id="raceInput" value="7" min="1" max="99">
-      <div class="stepper-divider"></div>
-      <button class="stepper-btn" id="stepUp">+</button>
+  <div class="game-options-row">
+    <!-- Game Type -->
+    <div class="game-type-col">
+      <label class="options-label">Game Type</label>
+      <div class="ball-selector">
+        <button class="ball-pick selected" id="pick8" onclick="selectGame('8ball')" title="8 Ball">
+          <svg width="42" height="42" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <radialGradient id="b8grad" cx="38%" cy="32%" r="62%">
+                <stop offset="0%"   stop-color="#3a3a3a"/>
+                <stop offset="45%"  stop-color="#111"/>
+                <stop offset="100%" stop-color="#000"/>
+              </radialGradient>
+              <radialGradient id="b8spec" cx="36%" cy="28%" r="26%">
+                <stop offset="0%"   stop-color="rgba(255,255,255,0.5)"/>
+                <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+              </radialGradient>
+              <radialGradient id="b8circ" cx="50%" cy="45%" r="55%">
+                <stop offset="0%"   stop-color="#fff"/>
+                <stop offset="100%" stop-color="#e8e8e8"/>
+              </radialGradient>
+            </defs>
+            <circle cx="30" cy="30" r="27" fill="url(#b8grad)"/>
+            <circle cx="30" cy="32" r="10" fill="url(#b8circ)"/>
+            <text x="30" y="37" font-family="Arial,sans-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="#111">8</text>
+            <circle cx="30" cy="30" r="27" fill="url(#b8spec)"/>
+          </svg>
+        </button>
+
+        <button class="ball-pick" id="pick9" onclick="selectGame('9ball')" title="9 Ball">
+          <svg width="42" height="42" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <radialGradient id="b9grad" cx="38%" cy="32%" r="62%">
+                <stop offset="0%"   stop-color="#ffe566"/>
+                <stop offset="50%"  stop-color="#e8c020"/>
+                <stop offset="100%" stop-color="#b89000"/>
+              </radialGradient>
+              <radialGradient id="b9spec" cx="36%" cy="28%" r="26%">
+                <stop offset="0%"   stop-color="rgba(255,255,255,0.6)"/>
+                <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+              </radialGradient>
+              <radialGradient id="b9circ" cx="50%" cy="45%" r="55%">
+                <stop offset="0%"   stop-color="#fff"/>
+                <stop offset="100%" stop-color="#f0f0f0"/>
+              </radialGradient>
+            </defs>
+            <!-- Yellow ball body -->
+            <circle cx="30" cy="30" r="27" fill="url(#b9grad)"/>
+            <!-- White stripe band -->
+            <path d="M6,22 Q30,14 54,22 L54,38 Q30,46 6,38 Z" fill="#fff" opacity="0.92"/>
+            <!-- White circle with number -->
+            <circle cx="30" cy="30" r="10" fill="url(#b9circ)"/>
+            <text x="30" y="35" font-family="Arial,sans-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="#111">9</text>
+            <circle cx="30" cy="30" r="27" fill="url(#b9spec)"/>
+          </svg>
+        </button>
+
+        <button class="ball-pick" id="pick10" onclick="selectGame('10ball')" title="10 Ball">
+          <svg width="42" height="42" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <radialGradient id="b10grad" cx="38%" cy="32%" r="62%">
+                <stop offset="0%"   stop-color="#5599ff"/>
+                <stop offset="50%"  stop-color="#1a55cc"/>
+                <stop offset="100%" stop-color="#0a2a88"/>
+              </radialGradient>
+              <radialGradient id="b10spec" cx="36%" cy="28%" r="26%">
+                <stop offset="0%"   stop-color="rgba(255,255,255,0.55)"/>
+                <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+              </radialGradient>
+              <radialGradient id="b10circ" cx="50%" cy="45%" r="55%">
+                <stop offset="0%"   stop-color="#fff"/>
+                <stop offset="100%" stop-color="#f0f0f0"/>
+              </radialGradient>
+            </defs>
+            <!-- Blue ball body -->
+            <circle cx="30" cy="30" r="27" fill="url(#b10grad)"/>
+            <!-- White stripe band -->
+            <path d="M6,22 Q30,14 54,22 L54,38 Q30,46 6,38 Z" fill="#fff" opacity="0.92"/>
+            <!-- White circle with number -->
+            <circle cx="30" cy="30" r="10" fill="url(#b10circ)"/>
+            <text x="30" y="35" font-family="Arial,sans-serif" font-size="11" font-weight="bold" text-anchor="middle" fill="#111">10</text>
+            <circle cx="30" cy="30" r="27" fill="url(#b10spec)"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Race To -->
+    <div class="race-row">
+      <label class="options-label">Race to</label>
+      <div class="stepper">
+        <button class="stepper-btn" id="stepDown">−</button>
+        <div class="stepper-divider"></div>
+        <input class="stepper-value" type="number" id="raceInput" value="7" min="1" max="99">
+        <div class="stepper-divider"></div>
+        <button class="stepper-btn" id="stepUp">+</button>
+      </div>
     </div>
   </div>
 
@@ -1040,6 +1179,14 @@
   let history = []; // [{player: 0|1}]
   let matchOver = false;
   let lastWinner = null;
+  let gameType = '8ball'; // '8ball', '9ball', '10ball'
+
+  function selectGame(type) {
+    gameType = type;
+    document.querySelectorAll('.ball-pick').forEach(b => b.classList.remove('selected'));
+    const map = { '8ball': 'pick8', '9ball': 'pick9', '10ball': 'pick10' };
+    document.getElementById(map[type]).classList.add('selected');
+  }
 
   function openRaceToModal() {
     document.getElementById('racetoInput').value = raceTo;
@@ -1376,6 +1523,8 @@
     // Reset race to 7
     raceTo = 7;
     document.getElementById('raceInput').value = 7;
+    // Reset game type to 8ball
+    selectGame('8ball');
     // Reset cue ball to centre
     breakPlayer = null;
     lastWinner = null;
@@ -1411,6 +1560,8 @@
     // Reset race to 7
     raceTo = 7;
     document.getElementById('raceInput').value = 7;
+    // Reset game type to 8ball
+    selectGame('8ball');
     // Reset cue ball to centre
     breakPlayer = null;
     cueBall.style.transition = 'left 0.3s cubic-bezier(0.22,1,0.36,1)';
