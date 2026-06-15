@@ -1,4 +1,4 @@
-const CACHE = 'match-play-v17';
+const CACHE = 'match-play-v18';
 const ASSETS = ['./match-play.html', './manifest.json'];
 
 self.addEventListener('install', e => {

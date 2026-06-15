@@ -1560,8 +1560,8 @@
     buildTracks();
     setActivePlayer(breakPlayer !== null ? breakPlayer : 0);
     showScreen('game');
-    // Play break sound as match begins
-    setTimeout(() => playBreakSound(), 300);
+    inputLocked = true;
+    setTimeout(() => { inputLocked = false; playBreakSound(); }, 600);
   }
 
   function buildTracks() { /* dots removed */ }
@@ -1671,8 +1671,10 @@
     ball.addEventListener('animationend', () => ball.remove());
   }
 
+  let inputLocked = false;
+
   function addPoint(player) {
-    if (matchOver) return;
+    if (matchOver || inputLocked) return;
     scores[player]++;
     history.push({ player });
     racksPlayed++;
@@ -1742,13 +1744,16 @@
     history = [];
     matchOver = false;
     racksPlayed = 0;
-    raceTo = 7;
+    // Keep the same raceTo from the finished match (don't reset to 7)
     document.getElementById('raceDisplay').textContent = raceTo;
+    document.getElementById('racetoInput').value = raceTo;
     document.getElementById('p1score').textContent = '0';
     document.getElementById('p2score').textContent = '0';
+    updateRacksDisplay();
     setActivePlayer(lastWinner !== null ? lastWinner : 0);
     showScreen('game');
-    setTimeout(() => playBreakSound(), 300);
+    inputLocked = true;
+    setTimeout(() => { inputLocked = false; playBreakSound(); }, 600);
   }
 
   function returnToSetup() {
